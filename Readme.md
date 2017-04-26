@@ -10,3 +10,9 @@ C'est tout.
 D'un loint de vue technique, le module definit un template Helper qui va chercher le template actif en session
 plutôt qu'en base de données.
 
+Le module propose un évènement TemplateSwitcherEvent, à dispatcher avec TemplateSwitcherEvent::SWITCH_TEMPLATE_EVENT :
+ 
+    $this->getDispatcher()->dispatch(
+        TemplateSwitcherEvent::SWITCH_TEMPLATE_EVENT,
+        new TemplateSwitcherEvent('nom-du-template-front')
+    );

@@ -8,5 +8,11 @@
         <service id="thelia.template_helper" class="TemplateSwitcher\Template\SessionTemplateHelper">
             <argument type="service" id="request_stack"/>
         </service>
+
+        <service id="send.payzen.mail" class="TemplateSwitcher\EventListener\TemplateSwitcherListener">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="thelia.template_helper"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 </config>

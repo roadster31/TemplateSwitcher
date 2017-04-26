@@ -10,24 +10,43 @@
 
 /**
  * Created by Franck Allimant, CQFDev <franck@cqfdev.fr>
- * Date: 09/02/2017 22:45
+ * Date: 26/04/2017 11:04
  */
+namespace TemplateSwitcher\Events;
 
-namespace TemplateSwitcher\Controller;
+use Thelia\Core\Event\ActionEvent;
 
-use TemplateSwitcher\Events\TemplateSwitcherEvent;
-use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Tools\URL;
-
-class SwitcherController extends BaseFrontController
+class TemplateSwitcherEvent extends ActionEvent
 {
-    public function set($templateName)
-    {
-        $this->getDispatcher()->dispatch(
-            TemplateSwitcherEvent::SWITCH_TEMPLATE_EVENT,
-            new TemplateSwitcherEvent($templateName)
-        );
+    const SWITCH_TEMPLATE_EVENT = "templateswitcher.switch-to";
 
-        return $this->generateRedirect(URL::getInstance()->absoluteUrl('/'));
+    /** @var  string */
+    protected $templateName;
+
+    /**
+     * TemplateSwitcherEvent constructor.
+     * @param string $templateName
+     */
+    public function __construct($templateName)
+    {
+        $this->templateName = $templateName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateName()
+    {
+        return $this->templateName;
+    }
+
+    /**
+     * @param string $templateName
+     * @return $this
+     */
+    public function setTemplateName($templateName)
+    {
+        $this->templateName = $templateName;
+        return $this;
     }
 }

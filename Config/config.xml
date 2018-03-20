@@ -9,7 +9,7 @@
             <argument type="service" id="request_stack"/>
         </service>
 
-        <service id="send.payzen.mail" class="TemplateSwitcher\EventListener\TemplateSwitcherListener">
+        <service id="templateswitcher.listener" class="TemplateSwitcher\EventListener\TemplateSwitcherListener">
             <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.template_helper"/>
             <tag name="kernel.event_subscriber"/>

@@ -17,6 +17,7 @@ namespace TemplateSwitcher\Controller;
 
 use TemplateSwitcher\Events\TemplateSwitcherEvent;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Tools\URL;
 
 class SwitcherController extends BaseFrontController
@@ -25,7 +26,7 @@ class SwitcherController extends BaseFrontController
     {
         $this->getDispatcher()->dispatch(
             TemplateSwitcherEvent::SWITCH_TEMPLATE_EVENT,
-            new TemplateSwitcherEvent($templateName)
+            (new TemplateSwitcherEvent($templateName))->setTemplateType(TemplateDefinition::FRONT_OFFICE)
         );
 
         return $this->generateRedirect(URL::getInstance()->absoluteUrl('/'));

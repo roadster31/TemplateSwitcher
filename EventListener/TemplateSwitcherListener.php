@@ -58,17 +58,17 @@ class TemplateSwitcherListener implements EventSubscriberInterface
     public function switchTo(TemplateSwitcherEvent $event)
     {
         // Check template name
-        $tplList = $this->templateHelper->getList(TemplateDefinition::FRONT_OFFICE);
+        $tplList = $this->templateHelper->getList($event->getTemplateType());
 
         $requiredTemplateName = $event->getTemplateName();
 
         /** @var TemplateDefinition $tpl */
         foreach ($tplList as $tpl) {
-            if ($tpl->getName() == $requiredTemplateName) {
+            if ($tpl->getName() === $requiredTemplateName) {
                 $this->requestStack
                     ->getCurrentRequest()
                     ->getSession()
-                    ->set(TemplateSwitcher::ACTIVE_FRONT_VAR_NAME, $requiredTemplateName);
+                    ->set(TemplateSwitcher::getActiveTemplateVarName($event->getTemplateType()), $requiredTemplateName);
 
                 break;
             }

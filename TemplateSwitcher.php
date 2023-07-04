@@ -12,12 +12,21 @@
 
 namespace TemplateSwitcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Module\BaseModule;
 
 class TemplateSwitcher extends BaseModule
 {
     /** @var string */
     const DOMAIN_NAME = 'templateswitcher';
-    
-    const ACTIVE_FRONT_VAR_NAME = 'templateswitcher.front';
+
+    const ACTIVE_TEMPLATE_VAR_PREFIX = 'templateswitcher.';
+
+    /**
+     * @param string|number $templateDefinition
+     */
+    public static function getActiveTemplateVarName($templateDefinition)
+    {
+        return self::ACTIVE_TEMPLATE_VAR_PREFIX . $templateDefinition;
+    }
 }

@@ -15,6 +15,7 @@
 namespace TemplateSwitcher\Events;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Template\TemplateDefinition;
 
 class TemplateSwitcherEvent extends ActionEvent
 {
@@ -22,6 +23,7 @@ class TemplateSwitcherEvent extends ActionEvent
 
     /** @var  string */
     protected $templateName;
+    protected $templateType = TemplateDefinition::FRONT_OFFICE;
 
     /**
      * TemplateSwitcherEvent constructor.
@@ -47,6 +49,24 @@ class TemplateSwitcherEvent extends ActionEvent
     public function setTemplateName($templateName)
     {
         $this->templateName = $templateName;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTemplateType()
+    {
+        return $this->templateType;
+    }
+
+    /**
+     * @param int $templateType
+     * @return $this
+     */
+    public function setTemplateType($templateType)
+    {
+        $this->templateType = $templateType;
         return $this;
     }
 }

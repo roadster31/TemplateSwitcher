@@ -47,11 +47,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      */
     public function isActive(TemplateDefinition $tplDefinition)
     {
-        if ($tplDefinition->getType() === TemplateDefinition::FRONT_OFFICE) {
-            return $tplDefinition->getName() == $this->getSessionTplName();
-        } else {
-            return parent::isActive($tplDefinition);
-        }
+        return $tplDefinition->getName() === $this->getSessionTplName(TemplateSwitcher::getActiveTemplateVarName($tplDefinition->getType()));
     }
 
     /**
@@ -60,35 +56,92 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      */
     public function getActiveFrontTemplate()
     {
-        if (null === $sessionTplName = $this->getSessionTplName()) {
-            return parent::getActiveFrontTemplate();
-        }
-
-        $tplDef = new TemplateDefinition(
-            $sessionTplName,
-            TemplateDefinition::FRONT_OFFICE
+        return $this->getActiveTemplate(
+            TemplateDefinition::FRONT_OFFICE,
+            parent::getActiveFrontTemplate()
         );
-
-        // Etre sur de charger les ressources de langue de ce template, et des templates parent
-        if (! $this->translationsLoaded) {
-            /** @var TemplateDefinition $parentTemplate */
-            foreach ($tplDef->getParentList() as $parentTemplate) {
-                $this->loadTranslation($parentTemplate->getAbsoluteI18nPath(), $parentTemplate->getTranslationDomain());
-            }
-
-            $this->loadTranslation($tplDef->getAbsoluteI18nPath(), $tplDef->getTranslationDomain());
-
-            $this->translationsLoaded = true;
-        }
-
-        if (! is_dir($tplDef->getAbsolutePath())) {
-            throw new \InvalidArgumentException("Template directory '$sessionTplName' not found.");
-        }
-
-        return $tplDef;
     }
 
-    protected function getSessionTplName()
+    /**
+     * @return TemplateDefinition
+     * @throws \Exception
+     */
+    public function getActiveMailTemplate()
+    {
+        return $this->getActiveTemplate(
+            TemplateDefinition::EMAIL,
+            parent::getActiveMailTemplate()
+        );
+    }
+
+    /**
+     * @return TemplateDefinition
+     * @throws \Exception
+     */
+    public function getActivePdfTemplate()
+    {
+        return $this->getActiveTemplate(
+            TemplateDefinition::PDF,
+            parent::getActivePdfTemplate()
+        );
+    }
+
+    /**
+     * @return TemplateDefinition
+     * @throws \Exception
+     */
+    public function getActiveAdminTemplate()
+    {
+        return $this->getActiveTemplate(
+            TemplateDefinition::BACK_OFFICE,
+            parent::getActiveAdminTemplate()
+        );
+    }
+
+    /**
+     * @param $templateType
+     * @param $templateVar
+     * @param $default
+     * @return TemplateDefinition
+     * @throws \Exception
+     */
+    protected function getActiveTemplate($templateType, $default)
+    {
+        static $activeTemplateCache = [];
+
+        if (null === $sessionTplName = $this->getSessionTplName(TemplateSwitcher::getActiveTemplateVarName($templateType))) {
+            return $default;
+        }
+
+        if (! isset($activeTemplateCache[$templateType])) {
+            $tplDef = new TemplateDefinition(
+                $sessionTplName,
+                $templateType
+            );
+
+            // Etre sur de charger les ressources de langue de ce template, et des templates parent
+            if (!$this->translationsLoaded) {
+                /** @var TemplateDefinition $parentTemplate */
+                foreach ($tplDef->getParentList() as $parentTemplate) {
+                    $this->loadTranslation($parentTemplate->getAbsoluteI18nPath(), $parentTemplate->getTranslationDomain());
+                }
+
+                $this->loadTranslation($tplDef->getAbsoluteI18nPath(), $tplDef->getTranslationDomain());
+
+                $this->translationsLoaded = true;
+            }
+
+            if (!is_dir($tplDef->getAbsolutePath())) {
+                throw new \InvalidArgumentException("Template directory '$sessionTplName' not found.");
+            }
+
+            $activeTemplateCache[$templateType] = $tplDef;
+        }
+
+        return $activeTemplateCache[$templateType];
+    }
+
+    protected function getSessionTplName($templateVar)
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -97,7 +150,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
             return null;
         }
 
-        return $request->getSession()->get(TemplateSwitcher::ACTIVE_FRONT_VAR_NAME, null);
+        return $request->getSession()->get($templateVar, null);
     }
 
     private function loadTranslation($directory, $domain)

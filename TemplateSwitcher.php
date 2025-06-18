@@ -12,7 +12,7 @@
 
 namespace TemplateSwitcher;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 
 class TemplateSwitcher extends BaseModule
@@ -25,8 +25,16 @@ class TemplateSwitcher extends BaseModule
     /**
      * @param string|number $templateDefinition
      */
-    public static function getActiveTemplateVarName($templateDefinition)
+    public static function getActiveTemplateVarName($templateDefinition): string
     {
         return self::ACTIVE_TEMPLATE_VAR_PREFIX . $templateDefinition;
+    }
+
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode())."/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
     }
 }

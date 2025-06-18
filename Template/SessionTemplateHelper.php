@@ -25,18 +25,16 @@ use Thelia\Core\Translation\Translator;
 
 class SessionTemplateHelper extends TheliaTemplateHelper
 {
-    /** @var  RequestStack */
-    protected $requestStack;
-
     protected $translationsLoaded = false;
 
     /**
      * SessionTheliaTemplateHelper constructor.
      * @param RequestStack $requestStack
+     * @param $kernelCacheDir
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(protected RequestStack $requestStack, protected $kernelCacheDir)
     {
-        $this->requestStack = $requestStack;
+        parent::__construct($kernelCacheDir);
     }
 
     /**
@@ -45,16 +43,17 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      * @param  TemplateDefinition $tplDefinition
      * @return bool               true is the given template is the active template
      */
-    public function isActive(TemplateDefinition $tplDefinition)
+    public function isActive(TemplateDefinition $tplDefinition): bool
     {
-        return $tplDefinition->getName() === $this->getSessionTplName(TemplateSwitcher::getActiveTemplateVarName($tplDefinition->getType()));
+        return $tplDefinition->getName() === $this
+                ->getSessionTplName(TemplateSwitcher::getActiveTemplateVarName($tplDefinition->getType()));
     }
 
     /**
      * @return TemplateDefinition
      * @throws \Exception
      */
-    public function getActiveFrontTemplate()
+    public function getActiveFrontTemplate(): TemplateDefinition
     {
         return $this->getActiveTemplate(
             TemplateDefinition::FRONT_OFFICE,
@@ -66,7 +65,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      * @return TemplateDefinition
      * @throws \Exception
      */
-    public function getActiveMailTemplate()
+    public function getActiveMailTemplate(): TemplateDefinition
     {
         return $this->getActiveTemplate(
             TemplateDefinition::EMAIL,
@@ -78,7 +77,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      * @return TemplateDefinition
      * @throws \Exception
      */
-    public function getActivePdfTemplate()
+    public function getActivePdfTemplate(): TemplateDefinition
     {
         return $this->getActiveTemplate(
             TemplateDefinition::PDF,
@@ -90,7 +89,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      * @return TemplateDefinition
      * @throws \Exception
      */
-    public function getActiveAdminTemplate()
+    public function getActiveAdminTemplate(): TemplateDefinition
     {
         return $this->getActiveTemplate(
             TemplateDefinition::BACK_OFFICE,
@@ -100,16 +99,16 @@ class SessionTemplateHelper extends TheliaTemplateHelper
 
     /**
      * @param $templateType
-     * @param $templateVar
      * @param $default
      * @return TemplateDefinition
      * @throws \Exception
      */
-    protected function getActiveTemplate($templateType, $default)
+    protected function getActiveTemplate($templateType, $default): TemplateDefinition
     {
         static $activeTemplateCache = [];
 
-        if (null === $sessionTplName = $this->getSessionTplName(TemplateSwitcher::getActiveTemplateVarName($templateType))) {
+        if (null === $sessionTplName = $this
+                ->getSessionTplName(TemplateSwitcher::getActiveTemplateVarName($templateType))) {
             return $default;
         }
 
@@ -123,7 +122,10 @@ class SessionTemplateHelper extends TheliaTemplateHelper
             if (!$this->translationsLoaded) {
                 /** @var TemplateDefinition $parentTemplate */
                 foreach ($tplDef->getParentList() as $parentTemplate) {
-                    $this->loadTranslation($parentTemplate->getAbsoluteI18nPath(), $parentTemplate->getTranslationDomain());
+                    $this->loadTranslation(
+                        $parentTemplate->getAbsoluteI18nPath(),
+                        $parentTemplate->getTranslationDomain()
+                    );
                 }
 
                 $this->loadTranslation($tplDef->getAbsoluteI18nPath(), $tplDef->getTranslationDomain());
@@ -146,11 +148,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
         $request = $this->requestStack->getCurrentRequest();
 
         // Request maybe null when the container is built.
-        if (null === $request) {
-            return null;
-        }
-
-        return $request->getSession()->get($templateVar, null);
+        return $request?->getSession()?->get($templateVar);
     }
 
     private function loadTranslation($directory, $domain)

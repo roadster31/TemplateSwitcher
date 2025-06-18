@@ -27,7 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use TemplateSwitcher\TemplateSwitcher;
 use TemplateSwitcher\Events\TemplateSwitcherEvent;
-use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 
 /**
@@ -37,22 +36,15 @@ use Thelia\Core\Template\TemplateHelperInterface;
  */
 class TemplateSwitcherListener implements EventSubscriberInterface
 {
-    /** @var  RequestStack */
-    protected $requestStack;
-
-    /** @var  TemplateHelperInterface */
-    protected $templateHelper;
-
     /**
      * TemplateSwitcherListener constructor.
-     * @param RequestStack $request
+     * @param RequestStack $requestStack
      * @param TemplateHelperInterface $templateHelper
      */
-    public function __construct(RequestStack $request, TemplateHelperInterface $templateHelper)
-    {
-        $this->requestStack = $request;
-        $this->templateHelper = $templateHelper;
-    }
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected TemplateHelperInterface $templateHelper
+    ){}
 
 
     public function switchTo(TemplateSwitcherEvent $event)
@@ -62,7 +54,6 @@ class TemplateSwitcherListener implements EventSubscriberInterface
 
         $requiredTemplateName = $event->getTemplateName();
 
-        /** @var TemplateDefinition $tpl */
         foreach ($tplList as $tpl) {
             if ($tpl->getName() === $requiredTemplateName) {
                 $this->requestStack
@@ -77,8 +68,8 @@ class TemplateSwitcherListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            TemplateSwitcherEvent::SWITCH_TEMPLATE_EVENT => array("switchTo", 128)
-        );
+        return [
+            TemplateSwitcherEvent::SWITCH_TEMPLATE_EVENT => ["switchTo", 128]
+        ];
     }
 }

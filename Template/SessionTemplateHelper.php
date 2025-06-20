@@ -16,6 +16,7 @@
  */
 namespace TemplateSwitcher\Template;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use TemplateSwitcher\TemplateSwitcher;
@@ -32,7 +33,10 @@ class SessionTemplateHelper extends TheliaTemplateHelper
      * @param RequestStack $requestStack
      * @param $kernelCacheDir
      */
-    public function __construct(protected RequestStack $requestStack, protected $kernelCacheDir)
+    public function __construct(
+        protected RequestStack $requestStack,
+        #[Autowire('%kernel.cache_dir%')] protected $kernelCacheDir
+    )
     {
         parent::__construct($kernelCacheDir);
     }

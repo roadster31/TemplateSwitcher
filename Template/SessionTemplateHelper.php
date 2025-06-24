@@ -1,26 +1,28 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*      This file is part of the Thelia package. */
+
+/*      Copyright (c) OpenStudio */
+/*      email : dev@thelia.net */
+/*      web : http://www.thelia.net */
+
+/*      For the full copyright and license information, please view the LICENSE.txt */
+/*      file that was distributed with this source code. */
 
 /**
  * @author Franck Allimant <franck@cqfdev.fr>
  * Creation date: 26/03/2015 16:36
  */
+
 namespace TemplateSwitcher\Template;
 
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use TemplateSwitcher\TemplateSwitcher;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Core\Translation\Translator;
 
@@ -30,22 +32,18 @@ class SessionTemplateHelper extends TheliaTemplateHelper
 
     /**
      * SessionTheliaTemplateHelper constructor.
-     * @param RequestStack $requestStack
-     * @param $kernelCacheDir
      */
     public function __construct(
         protected RequestStack $requestStack,
         #[Autowire('%kernel.cache_dir%')] protected $kernelCacheDir
-    )
-    {
+    ) {
         parent::__construct($kernelCacheDir);
     }
 
     /**
-     * Check if a template definition is the current active template
+     * Check if a template definition is the current active template.
      *
-     * @param  TemplateDefinition $tplDefinition
-     * @return bool               true is the given template is the active template
+     * @return bool true is the given template is the active template
      */
     public function isActive(TemplateDefinition $tplDefinition): bool
     {
@@ -54,7 +52,6 @@ class SessionTemplateHelper extends TheliaTemplateHelper
     }
 
     /**
-     * @return TemplateDefinition
      * @throws \Exception
      */
     public function getActiveFrontTemplate(): TemplateDefinition
@@ -66,7 +63,6 @@ class SessionTemplateHelper extends TheliaTemplateHelper
     }
 
     /**
-     * @return TemplateDefinition
      * @throws \Exception
      */
     public function getActiveMailTemplate(): TemplateDefinition
@@ -78,7 +74,6 @@ class SessionTemplateHelper extends TheliaTemplateHelper
     }
 
     /**
-     * @return TemplateDefinition
      * @throws \Exception
      */
     public function getActivePdfTemplate(): TemplateDefinition
@@ -90,7 +85,6 @@ class SessionTemplateHelper extends TheliaTemplateHelper
     }
 
     /**
-     * @return TemplateDefinition
      * @throws \Exception
      */
     public function getActiveAdminTemplate(): TemplateDefinition
@@ -102,9 +96,6 @@ class SessionTemplateHelper extends TheliaTemplateHelper
     }
 
     /**
-     * @param $templateType
-     * @param $default
-     * @return TemplateDefinition
      * @throws \Exception
      */
     protected function getActiveTemplate($templateType, $default): TemplateDefinition
@@ -116,7 +107,7 @@ class SessionTemplateHelper extends TheliaTemplateHelper
             return $default;
         }
 
-        if (! isset($activeTemplateCache[$templateType])) {
+        if (!isset($activeTemplateCache[$templateType])) {
             $tplDef = new TemplateDefinition(
                 $sessionTplName,
                 $templateType

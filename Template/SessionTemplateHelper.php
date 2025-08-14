@@ -16,16 +16,16 @@
 
 namespace TemplateSwitcher\Template;
 
-use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use TemplateSwitcher\TemplateSwitcher;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 
+#[AsDecorator(decorates: TheliaTemplateHelper::class)]
 class SessionTemplateHelper extends TheliaTemplateHelper
 {
     protected $translationsLoaded = false;

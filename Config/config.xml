@@ -4,4 +4,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
+    <services>
+        <service id="thelia.template_helper" class="TemplateSwitcher\Template\SessionTemplateHelper" public="true">
+            <argument type="service" id="request_stack" />
+            <argument>%kernel.cache_dir%</argument>
+        </service>
+    </services>
 </config>
